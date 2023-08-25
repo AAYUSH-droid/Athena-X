@@ -1,10 +1,14 @@
 import express, { Express, Request, Response } from "express";
+import dotenv from "dotenv";
+import { connectDB } from "./db/connectDB";
 
 const app: Express = express();
-const port = 3000;
+dotenv.config();
 
+connectDB();
+const port = process.env.PORT;
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello, this is Express + TypeScript/");
+  res.send("Hello, this is Express + TypeScript");
 });
 
 app.listen(port, () => {
