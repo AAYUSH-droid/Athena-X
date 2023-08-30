@@ -15,19 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const invalidInputResponse_1 = __importDefault(require("@utils/invalidInputResponse"));
 const questionModel_1 = __importDefault(require("@models/question/questionModel"));
 const failureResponse_1 = __importDefault(require("@utils/failureResponse"));
-const quizModel_1 = __importDefault(require("@models/quiz/quizModel"));
-const deleteQuestion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!req.body.questionId) {
+const getQuestion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!req.params.questionId) {
         return (0, invalidInputResponse_1.default)(res);
     }
     // get data from request body
-    const { questionId } = req.body;
+    const { questionId } = req.params;
     try {
-        // delete questionId from quiz's section array
-        const updateQuiz = yield quizModel_1.default.findOneAndUpdate({ "sections.questions": questionId }, { $pull: { "sections.$.questions": questionId } }, { new: true });
-        // delete question
-        const question = yield questionModel_1.default.findByIdAndDelete(questionId);
-        if (!question || !updateQuiz) {
+        // finding question
+        const question = yield questionModel_1.default.findById(questionId);
+        // send response
+        if (!question) {
             return (0, failureResponse_1.default)({
                 res,
                 error: "Question not found",
@@ -37,7 +35,8 @@ const deleteQuestion = (req, res) => __awaiter(void 0, void 0, void 0, function*
         }
         else {
             return res.status(200).json({
-                message: "Question deleted",
+                message: "Question found",
+                question,
             });
         }
     }
@@ -45,8 +44,8 @@ const deleteQuestion = (req, res) => __awaiter(void 0, void 0, void 0, function*
         (0, failureResponse_1.default)({
             res,
             error,
-            messageToSend: "Failed to delete question",
+            messageToSend: "Failed to get question",
         });
     }
 });
-exports.default = deleteQuestion;
+exports.default = getQuestion;
